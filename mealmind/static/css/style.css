@@ -1,0 +1,147 @@
+.bg-image {
+    background-image: url("../img/mealmindbg.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Color overlay */
+.bg-image::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 2;
+}
+
+#ingredient-options {
+    max-height: 400px; /* You can adjust this height */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+/* Main content above overlay */
+.bg-image>.container {
+    position: relative;
+    z-index: 3;
+}
+
+.searchbar {
+    width: 100%;
+
+}
+
+.list {
+    list-style: none;
+}
+
+.list li::before {
+    content: "•";
+    color: green;
+    font-weight: bold;
+    display: inline-block;
+    width: 15px;
+}
+.searchable-container {
+    margin: 20px 0 0 0;
+}
+
+.searchable-container label.btn-default.active {
+    background-color: #007ba7;
+    color: #FFF;
+}
+
+.searchable-container label.btn-default {
+    width: 90%;
+    border-radius: 10px;
+    margin: 5px;
+    background-color:#f8f9fa;
+}
+
+.searchable-container label .bizcontent {
+    width: 100%;
+}
+
+.searchable-container .btn-group {
+    width: 90%;
+}
+
+.searchable-container .btn span.glyphicon {
+    opacity: 0;
+}
+
+.searchable-container .btn.active span.glyphicon {
+    opacity: 1;
+}
+
+#selected-ingredients {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 20px;
+
+}
+
+#selected-list .badge {
+    font-size: 1rem;
+    padding: 10px;
+}
+
+.btn-primary {
+    background-color: #dc3545;
+    /* Red like the navbar */
+    border-color: #dc3545;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    /* Rounded button */
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: green;
+
+}
+.searchable-container-detail {
+    margin: 20px 0 0 0;
+}
+
+
+.searchable-container-detail label.btn-default {
+    width: 90%;
+    border-radius: 10px;
+    margin: 5px;
+    background-color: green;
+}
+
+.searchable-container-detail label .bizcontent {
+    width: 100%;
+    background-color: green;
+}
+
+.searchable-container-detail .btn-group {
+    width: 90%;
+}
+
+.searchable-container-detail .btn span.glyphicon {
+    opacity: 0;
+}
+
+.searchable-container-detail .btn.active span.glyphicon {
+    opacity: 1;
+}
+@media(min-width: 768px) {
+    .searchbar {
+        width: 70%;
+
+    }
+}

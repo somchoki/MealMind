@@ -1,0 +1,511 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MealMind - Your Personal Meal Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        xintegrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <style>
+        /* Universal box-sizing for consistent layout */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light blue-gray background */
+            color: #334155; /* Darker text for readability */
+        }
+        .bg-image {
+            /* Using a static URL for the background image. Ensure 'mealmindbg.jpeg' is in core/static/core/img/ */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            z-index: 1;
+        }
+        .bg-image::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white overlay */
+            z-index: 2;
+        }
+        .bg-image > .container {
+            position: relative;
+            z-index: 3;
+        }
+        .btn-primary {
+            background-color: #dc3545; /* Red like the navbar */
+            border-color: #dc3545;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 30px; /* Rounded button */
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #28a745; /* Green on hover */
+        }
+        @media(min-width: 768px) {
+            .searchbar-container {
+                width: 70%;
+            }
+        }
+
+        /* Category filter buttons */
+        .category-filter-group {
+            display: flex; /* Use flexbox for spacing */
+            justify-content: center; /* Center buttons */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            margin-bottom: 15px;
+        }
+        .category-filter-group .btn {
+            border-color: #dc3545;
+            color: #dc3545;
+            font-weight: bold;
+            border-radius: 8px; /* Rounded corners */
+            margin: 5px 10px; /* More space between buttons */
+            padding: 12px 25px; /* Larger padding */
+            font-size: 1.05rem; /* Slightly larger font */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for "lift" */
+            transition: all 0.3s ease; /* Smooth transition for hover */
+        }
+        .category-filter-group .btn:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Enhanced shadow on hover */
+        }
+        .category-filter-group .btn.active {
+            background-color: #dc3545;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Slightly darker shadow when active */
+        }
+
+        /* Category options styles */
+        .category-option-btn {
+            margin: 5px;
+            flex: 1 1 28%; /* Aim for 3-4 per row on larger screens */
+            min-width: 100px; /* Adjusted min-width for better responsiveness */
+            border-radius: 8px; 
+            text-align: center;
+            padding: 8px 10px; /* Slightly less padding */
+            font-size: 0.9rem;
+        }
+        .category-option-btn.active {
+            background-color: #dc3545; 
+            color: #FFF;
+            border-color: #dc3545;
+        }
+
+        .category-type-options {
+            margin-top: 15px; /* Reduced margin */
+            padding: 10px; /* Reduced padding */
+            background-color: #f0f2f5; /* Lighter background */
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            width: 100%;
+        }
+        .category-type-options h5 {
+            font-size: 1rem; /* Smaller heading */
+            margin-bottom: 10px;
+        }
+
+        /* Accordion specific styles */
+        .accordion-item {
+            z-index: 10; /* Ensure accordion items are above other content */
+            position: relative; /* Needed for z-index to work */
+        }
+        .accordion-header {
+            z-index: 11; /* Ensure header is above item content when collapsed */
+            position: relative;
+        }
+        .accordion-button {
+            padding: 1rem 1.25rem; /* Default Bootstrap padding */
+        }
+        .accordion-button:not(.collapsed) {
+            color: #fff; /* Text color for active state */
+            background-color: #dc3545; /* Red background for active state */
+            box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.125);
+        }
+        .accordion-button:focus {
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); /* Red focus ring */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) { 
+            .main-content-block {
+                padding: 20px;
+            }
+            .category-option-btn {
+                flex: 1 1 45%; /* 2 buttons per row */
+            }
+            .main-content-block .btn-primary {
+                width: 100%; /* Full width button */
+            }
+            .category-filter-group .btn {
+                margin: 5px; /* Consistent margin */
+                width: calc(50% - 10px); /* Two buttons per row, with margin */
+            }
+        }
+
+        @media (max-width: 576px) { 
+            .category-option-btn {
+                flex: 1 1 100%; /* 1 button per row */
+            }
+            .category-filter-group .btn {
+                width: 100%; /* Stack buttons vertically */
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="navbar navbar-expand-md bg-danger navbar-dark py-3 fixed-top">
+        <div class="container">
+            <a href="#" class="navbar-brand">MealMind </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+                <span class="navbar-toggler-icon">
+                </span>
+
+            </button>
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'about' %}" class="nav-link">ABOUT US</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <section class="bg-image min-h-screen flex flex-col items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
+        <div class="relative z-10 max-w-4xl w-full bg-white shadow-xl rounded-xl p-8 space-y-8 mt-24 md:mt-32">
+            <h1 class="text-4xl font-extrabold text-center text-green-700 mb-8">
+                What are you cooking today?
+            </h1>
+
+            <form method="POST" action="{% url 'mealmind' %}" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="form-action" value="recommend">
+                <input type="hidden" name="chosen_dish_data" id="chosen-dish-data">
+                <input type="hidden" name="previous_recommendations" id="previous-recommendations">
+
+                <div class="relative">
+                    <div class="flex gap-2 items-center">
+                        <label for="search" class="sr-only">Search for ingredients...</label>
+                        <input
+                            type="text"
+                            id="search"
+                            class="flex-grow px-5 py-3 border border-gray-300 rounded-full shadow-sm focus:ring-green-500 focus:border-green-500 text-lg"
+                            placeholder="Type ingredient and click 'Add' or select from suggestions..."
+                            value=""
+                            oninput="handleSearchTermChange(this.value)"
+                            onkeypress="if(event.key === 'Enter') { event.preventDefault(); handleAddIngredient(); }"
+                            autocomplete="off"
+                        >
+                        <button
+                            type="button"
+                            onclick="handleAddIngredient()"
+                            class="bg-blue-500 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-blue-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        >
+                            Add
+                        </button>
+                    </div>
+                    <div id="error-message" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm mt-2 hidden" role="alert">
+                        <span id="error-text"></span>
+                    </div>
+                    <ul id="suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto hidden">
+                        </ul>
+                </div>
+
+                <div id="selected-ingredients-display" class="bg-gray-100 p-5 rounded-2xl shadow-inner">
+                    <h5 class="text-lg font-semibold text-gray-700 mb-3">Selected Ingredients:</h5>
+                    <ul id="selected-list" class="flex flex-wrap gap-2">
+                    </ul>
+                    <input type="hidden" name="selected_ingredients" id="selected-ingredients-input">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="diet-select" class="block text-sm font-medium text-gray-700 mb-1">Diet Preference:</label>
+                        <select
+                            id="diet-select"
+                            name="selected_diet"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md shadow-sm"
+                        >
+                            <option value="">Any Diet</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten_free">Gluten-Free</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cuisine-select" class="block text-sm font-medium text-gray-700 mb-1">Cuisine Type:</label>
+                        <select
+                            id="cuisine-select"
+                            name="selected_cuisine"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md shadow-sm"
+                        >
+                            <option value="">Any Cuisine</option>
+                            <option value="italian">Italian</option>
+                            <option value="mexican">Mexican</option>
+                            <option value="indian">Indian</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <input type="hidden" name="selected_categories" id="selected-categories-input">
+                <div class="text-center mt-8">
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                    >
+                        Recommend Dishes
+                    </button>
+                </div>
+            </form>
+
+            <div id="dish-recommendation-results" class="mt-12 pt-8 border-t-2 border-gray-200">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-green-800 text-center mb-6">Choose Your Dish:</h3>
+                        <div class="list-group">
+                            <div class="accordion" id="accordionExample">
+                            </div>          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script id="ingredient-data" type="application/json">
+        {{ data|safe }}
+    </script>
+
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+    <script>
+        // Global variables to manage state in JavaScript
+        // Initialize selectedIngredients with hardcoded demo data
+        let selectedIngredients = new Set([]);
+        
+        // All ingredients data for suggestions - hardcoded for demo
+        const data = JSON.parse(document.getElementById('ingredient-data').textContent);
+        const allIngredients = data.ingredients
+        const recommended_recipes = data.recommended_recipes
+        
+        // DOM elements (using jQuery for consistency)
+        const searchInput = $('#search');
+        const selectedList = $('#selected-list');
+        const selectedIngredientsInput = $('#selected-ingredients-input');
+        const suggestionsList = $('#suggestions');
+        const errorMessageDiv = $('#error-message');
+        const errorTextSpan = $('#error-text');
+        const formActionInput = $('#form-action');
+        const chosenDishDataInput = $('#chosen-dish-data');
+        const previousRecommendationsInput = $('#previous-recommendations');
+        const accordionContainer = $('#accordionExample');
+
+
+        function formatIngredientName(name) {
+            return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function showErrorMessage(message) {
+            errorTextSpan.text(message);
+            errorMessageDiv.removeClass('hidden');
+        }
+
+        function hideErrorMessage() {
+            errorMessageDiv.addClass('hidden');
+            errorTextSpan.text('');
+        }
+
+        function updateSelectedDisplay() {
+            selectedList.empty();
+            if (selectedIngredients.size === 0) {
+                selectedList.html('<p class="text-gray-500 italic">No ingredients selected yet.</p>');
+            } else {
+                selectedIngredients.forEach(ingredient => {
+                    const li = $(`
+                        <li class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-full shadow-md">
+                            ${formatIngredientName(ingredient)}
+                            <button type="button" class="ml-2 -mr-1 text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white rounded-full" aria-label="Remove ${formatIngredientName(ingredient)}">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </li>
+                    `);
+                    li.find('button').on('click', () => handleRemoveSelected(ingredient));
+                    selectedList.append(li);
+                });
+            }
+            // Update the hidden input field for form submission
+            selectedIngredientsInput.val(JSON.stringify(Array.from(selectedIngredients)));
+        }
+
+        function handleAddIngredient(ingredientToAdd = searchInput.val()) {
+            const trimmedIngredient = ingredientToAdd.trim().toLowerCase();
+            if (trimmedIngredient === '') {
+                showErrorMessage('Please enter an ingredient to add.');
+                return;
+            }
+            if (selectedIngredients.has(trimmedIngredient)) {
+                showErrorMessage(`"${formatIngredientName(trimmedIngredient)}" is already selected.`);
+                return;
+            }
+
+            selectedIngredients.add(trimmedIngredient);
+            searchInput.val('');
+            suggestionsList.addClass('hidden');
+            suggestionsList.empty();
+            hideErrorMessage();
+            updateSelectedDisplay();
+        }
+
+        function handleRemoveSelected(ingredientToRemove) {
+            selectedIngredients.delete(ingredientToRemove);
+            hideErrorMessage();
+            updateSelectedDisplay();
+        }
+
+        function handleSearchTermChange(value) {
+            searchInput.val(value); // Ensure input value is updated when clicking suggestions
+            hideErrorMessage();
+
+            if (value.trim() === '') {
+                suggestionsList.addClass('hidden');
+                suggestionsList.empty();
+                return;
+            }
+
+            // Combine predefined ingredients and currently selected (user-added) ingredients for suggestions
+            const combinedIngredients = new Set([...allIngredients, ...Array.from(selectedIngredients)]);
+
+            const filtered = Array.from(combinedIngredients).filter(ingredient =>
+                ingredient.toLowerCase().includes(value.toLowerCase())
+            );
+            
+            if (filtered.length > 0) {
+                suggestionsList.empty();
+                filtered.forEach(ingredient => {
+                    const li = $(`
+                        <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800">
+                            ${formatIngredientName(ingredient)}
+                        </li>
+                    `);
+                    li.on('click', () => handleAddIngredient(ingredient)); // Use handleAddIngredient for suggestions
+                    suggestionsList.append(li);
+                });
+                suggestionsList.removeClass('hidden');
+            } else {
+                suggestionsList.addClass('hidden');
+                suggestionsList.empty();
+            }
+        }
+
+        // Form submission logic
+        $('form').on('submit', function (e) {
+
+            const ingredientsArray = Array.from(selectedIngredients);
+            // const categoriesArray = Array.from(selectedCategories);
+
+            if (ingredientsArray.length === 0) {
+                e.preventDefault(); // Always prevent default form submission now
+                showErrorMessage('Please add at least one ingredient or select a category filter.');
+                return false;
+            }
+            
+            // Set the hidden input for selected categories
+            // $('#selected-categories-input').val(JSON.stringify(categoriesArray));
+
+            // Now, call the client-side display function
+            displayDemoRecipes(ingredientsArray);
+        });
+
+        /**
+         * Displays recipes based on selected ingredients and categories from demo data.
+         * @param {Array<string>} ingredients - List of selected ingredient names.
+         * @param {Array<string>} categories - List of selected category tags.
+         */
+        function displayDemoRecipes(ingredients, categories=[]) {
+            accordionContainer.empty(); // Clear previous results
+
+            let filteredRecipes = recommended_recipes.filter(recipe => {
+                const recipeIngredients = recipe.ingredients.map(ing => ing.toLowerCase());
+                const recipeTags = (recipe.tags || []).map(tag => tag.toLowerCase());
+
+                // Check if all selected ingredients are in the recipe
+                const hasAllSelectedIngredients = ingredients.every(selIng => recipeIngredients.includes(selIng));
+
+                // Check if any selected category matches a recipe tag
+                const matchesAnyCategory = categories.length === 0 || categories.some(selCat => recipeTags.includes(selCat));
+
+                return hasAllSelectedIngredients && matchesAnyCategory;
+            });
+
+            if (filteredRecipes.length > 0) {
+                filteredRecipes.forEach((recipe, index) => {
+                    
+                    const isFirst = index === 0;
+                    const accordionItem = $(`
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading${index}">
+                                <button class="accordion-button ${isFirst ? '' : 'collapsed'}" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#collapse${index}"
+                                        aria-expanded="${isFirst ? 'true' : 'false'}"
+                                        aria-controls="collapse${index}">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">${recipe.recipe_name}</div>
+                                        <p class="card-text my-1">
+                                            <small class="text-body-secondary">
+                                            There are ${recipe.ingredients.length} ingredients in this recipe
+                                            </small>
+                                        </p>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse${index}" class="accordion-collapse collapse ${isFirst ? 'show' : ''}" 
+                                aria-labelledby="heading${index}" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <ul>
+                                    ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                                    </ul>
+                                    <p><a class="link-offset-2 link-underline link-underline-opacity-0" href="/details/${encodeURIComponent(recipe.recipe_slug)}/">View detailed recipe</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    accordionContainer.append(accordionItem);
+                });
+            } else {
+                accordionContainer.html(`
+                    <div class="text-center py-4">
+                        <p class="text-muted">There is nothing that matches your ingredients.</p>
+                    </div>
+                `);
+            }
+        }
+
+        // Initial display update on page load
+        $(document).ready(() => {
+            updateSelectedDisplay();
+            // Display all demo recipes initially
+            displayDemoRecipes([], []); 
+        });
+    </script>
+</body>
+</html>
