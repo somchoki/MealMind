@@ -2,6 +2,7 @@ appdirs==1.4.4
 asgiref==3.8.1
 atomicwrites==1.4.0
 Django==5.2.1
+gunicorn==23.0.0
 huggingface-hub==0.31.4
 jsonpointer==2.1
 matplotlib==3.9.2
@@ -19,4 +20,3 @@ tokenizers==0.21.1
 torch==2.7.0
 transformers==4.51.3
 wheel==0.45.1
-gunicorn
