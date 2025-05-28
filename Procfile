@@ -1,1 +1,1 @@
-web: gunicorn mealmind.wshi
+web: gunicorn mealmind.wsgi
