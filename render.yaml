@@ -1,5 +1,5 @@
 services:
   - type: web
-    name: mealmind-app
+    name: mealmind
     runtime: python
     buildCommand: pip install -r requirements.txt
